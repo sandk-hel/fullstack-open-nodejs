@@ -4,7 +4,16 @@ const morgan = require('morgan')
 const app = express()
 app.use(express.json())
 
-app.use(morgan('tiny'))
+const isPOSTRequest = (req, _) => {
+    return req.method === "POST"
+}
+
+morgan.token('bodyToken', 
+        (req, _) => JSON.stringify(req.body))
+app.use(morgan('tiny',
+            { skip: (req, res) => isPOSTRequest(req, res) }))
+app.use(morgan(':method :url :status :res[content-length]  - :response-time ms :bodyToken', 
+            { skip:  (req, res) => !isPOSTRequest(req, res) }))
 
 let persons = [
     {
