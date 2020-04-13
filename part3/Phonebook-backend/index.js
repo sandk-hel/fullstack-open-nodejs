@@ -46,6 +46,13 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
+app.post('/api/persons', (request, response) => {
+    const person = request.body
+    person.id = Math.floor(Math.random() * 1000000)
+    persons = [...persons, person]
+    response.json(request.body)
+})
+
 app.get('/info', (request, response) => {
     const date = new Date().toString()
     const numberOfPeople = persons.length
