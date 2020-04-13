@@ -46,11 +46,34 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
+const sendError = (response, message) => {
+    response.status(400).json({error: message})
+}
+
 app.post('/api/persons', (request, response) => {
-    const person = request.body
-    person.id = Math.floor(Math.random() * 1000000)
+    const name = request.body.name
+    const number = request.body.number
+
+    if (name === undefined) {
+        sendError(response, 'name must be present')
+        return 
+    }
+
+    if (number === undefined) {
+        sendError(response, 'phone must be present')
+        return
+    }
+
+    const existingPerson = persons.find(p => p.name.toLowerCase() === name.toLowerCase())
+    if (existingPerson) {
+        sendError(response, 'name must be unique')
+        return
+    }
+    
+    const id = Math.floor(Math.random() * 1000000)
+    const person = { id, name, number }
     persons = [...persons, person]
-    response.json(request.body)
+    response.status(201).json(person)
 })
 
 app.get('/info', (request, response) => {
