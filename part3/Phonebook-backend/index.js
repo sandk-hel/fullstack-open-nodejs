@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
-
 const app = express()
+const Person = require('./models/person')
+
 app.use(express.json())
 app.use(express.static('build'))
 
@@ -16,7 +18,7 @@ app.use(morgan('tiny',
 app.use(morgan(':method :url :status :res[content-length]  - :response-time ms :bodyToken', 
             { skip:  (req, res) => !isPOSTRequest(req, res) }))
 
-let persons = [
+const persons = [
     {
         "name": "Arto Hellas",
         "number": "040-123456",
@@ -40,7 +42,11 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find()
+          .then(persons => persons.map(p => p.toJSON()))
+          .then((persons) => {
+            response.json(persons)
+          })
 })
 
 app.get('/api/persons/:id', (request, response) => {
