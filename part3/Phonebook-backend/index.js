@@ -74,25 +74,19 @@ app.post('/api/persons', (request, response) => {
     const number = request.body.number
 
     if (name === undefined) {
-        sendError(response, 'name must be present')
-        return 
+        return sendError(response, 'name must be present')
     }
 
     if (number === undefined) {
-        sendError(response, 'phone must be present')
-        return
-    }
-
-    const existingPerson = persons.find(p => p.name.toLowerCase() === name.toLowerCase())
-    if (existingPerson) {
-        sendError(response, 'name must be unique')
-        return
+        return sendError(response, 'phone must be present')
     }
     
-    const id = Math.floor(Math.random() * 1000000)
-    const person = { id, name, number }
-    persons = [...persons, person]
-    response.status(201).json(person)
+    const newPerson = new Person({ name, number })
+    
+    newPerson.save()
+     .then(returnedPerson => {
+        response.status(201).json(returnedPerson)
+     })
 })
 
 app.get('/info', (request, response) => {
