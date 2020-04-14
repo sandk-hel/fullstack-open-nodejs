@@ -7,16 +7,16 @@ const Person = require('./models/person')
 app.use(express.json())
 app.use(express.static('build'))
 
-const isPOSTRequest = (req, _) => {
-    return req.method === "POST"
+const hasJSONBody = (req, _) => {
+    return req.method === "POST" || req.method === "PUT"
 }
 
 morgan.token('bodyToken', 
         (req, _) => JSON.stringify(req.body))
 app.use(morgan('tiny',
-            { skip: (req, res) => isPOSTRequest(req, res) }))
+            { skip: (req, res) => hasJSONBody(req, res) }))
 app.use(morgan(':method :url :status :res[content-length]  - :response-time ms :bodyToken', 
-            { skip:  (req, res) => !isPOSTRequest(req, res) }))
+            { skip:  (req, res) => !hasJSONBody(req, res) }))
 
 const persons = [
     {
