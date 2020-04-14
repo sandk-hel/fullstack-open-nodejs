@@ -63,7 +63,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
         .then(() => {
             response.status(204).end()
-        })
+        }).catch(error => next(error))
 })
 
 const sendError = (response, message) => {
@@ -98,6 +98,14 @@ app.get('/info', (request, response) => {
     response.send(responseString)
 })
 
+const errorHandler = (error, request, response, next) => {
+    if (error.name === 'CastError') {
+        return response.status(400).send({error: 'Malformed id'})
+    }
+    next(error)
+}
+
+app.use(errorHandler)
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running at port: ${PORT}`)
