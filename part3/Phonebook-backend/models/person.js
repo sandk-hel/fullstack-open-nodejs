@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 const mongoDBURL = process.env.MONGO_DB_URL
 
 const personSchema = new mongoose.Schema({
-    'name': String,
-    'number': String
+    name: { type: String, required: true },
+    number: { type: String, required: true, unique: true }
 })
 
 personSchema.set('toJSON', {
@@ -14,7 +14,7 @@ personSchema.set('toJSON', {
     }
 })
 
-mongoose.connect(mongoDBURL)
+mongoose.connect(mongoDBURL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false})
     .then(() => {
         console.log("Connected to mongodb")
     }).catch((error) => {

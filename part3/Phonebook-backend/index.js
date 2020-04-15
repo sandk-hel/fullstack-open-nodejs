@@ -47,18 +47,8 @@ const sendError = (response, message) => {
 
 app.post('/api/persons', (request, response, next) => {
     const name = request.body.name
-    const number = request.body.number
-
-    if (name === undefined) {
-        return sendError(response, 'name must be present')
-    }
-
-    if (number === undefined) {
-        return sendError(response, 'phone must be present')
-    }
-    
+    const number = request.body.number    
     const newPerson = new Person({ name, number })
-    
     newPerson.save()
      .then(returnedPerson => {
         response.status(201).json(returnedPerson)
@@ -88,9 +78,12 @@ app.get('/info', (request, response, next) => {
 })
 
 const errorHandler = (error, request, response, next) => {
-    if (error.name === 'CastError') {
+    if (error.name === 'CastError' && error.kind === 'ObjectId') {
         return response.status(400).send({error: 'Malformed id'})
+    } else if (error.name === 'ValidationError' || error.name === 'MongoError') {
+        return response.status(400).send({error: error.message})
     }
+    console.log("error ", error)
     next(error)
 }
 
