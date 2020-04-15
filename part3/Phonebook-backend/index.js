@@ -47,7 +47,7 @@ const sendError = (response, message) => {
     response.status(400).json({error: message})
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const name = request.body.name
     const number = request.body.number
 
@@ -64,7 +64,18 @@ app.post('/api/persons', (request, response) => {
     newPerson.save()
      .then(returnedPerson => {
         response.status(201).json(returnedPerson)
-     })
+     }).catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const name = request.body.name
+    const number = request.body.number
+    const updatePerson = { name, number }
+    Person.findByIdAndUpdate(request.params.id, updatePerson, { new: true })
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
