@@ -26,14 +26,12 @@ app.get('/api/persons', (request, response) => {
           })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(p => p.id === id)
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
+        .then(person => {
+            response.json(person)
+        })
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -78,12 +76,15 @@ app.put('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {
-    const date = new Date().toString()
-    const numberOfPeople = persons.length
-    const responseString = `<p>Phonebook has info for ${numberOfPeople} people</p>` 
-                                + date
-    response.send(responseString)
+app.get('/info', (request, response, next) => {
+    Person.count({})
+        .then((numberOfPersons) => {
+            const date = new Date().toString()
+
+            const responseString = `<p>Phonebook has info for ${numberOfPersons} people</p>` 
+            + date
+            response.send(responseString)
+        }).catch(error => next(error))
 })
 
 const errorHandler = (error, request, response, next) => {
