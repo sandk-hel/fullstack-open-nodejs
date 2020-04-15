@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 const mongoDBURL = process.env.MONGO_DB_URL
 
 const personSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    number: { type: String, required: true, unique: true }
+    name: { type: String, required: true, minlength: 3 },
+    number: { type: String, required: true, unique: true, minlength: 8 }
 })
 
 personSchema.set('toJSON', {
