@@ -41,6 +41,13 @@ describe('Get all', () => {
       ])
     )
   })
+
+  test('that the unique identifier property of the blog posts is named id', async () => {
+    const blogs = await api.get('/api/blogs')
+    expect(blogs.body).toHaveLength(2)
+    expect(blogs.body[0].id).toBeDefined()
+    expect(blogs.body[1].id).toBeDefined()
+  })
 })
 
 afterAll(() => {
