@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
+    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
     "lint": "eslint .",
-    "test": "jest --verbose"
+    "test": "NODE_ENV=test jest --verbose"
   },
   "author": "",
   "license": "ISC",
@@ -18,11 +19,13 @@
     "mongoose": "^5.9.9"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
     "jest": "^25.3.0",
-    "nodemon": "^2.0.3"
+    "nodemon": "^2.0.3",
+    "supertest": "^4.0.2"
   },
   "jest": {
     "testEnvironment": "node"

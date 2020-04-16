@@ -3,13 +3,13 @@ const Blog = require('../models/blog')
 
 const router = express.Router()
 
-router.get('/', (request, response, next) => {
-  Blog.find()
-    .then((blogs) => blogs.map((blog) => blog.toJSON()))
-    .then((blogs) => {
-      response.json(blogs)
-    })
-    .catch((error) => next(error))
+router.get('/', async (request, response, next) => {
+  try {
+    const blogs = await Blog.find()
+    response.json(blogs.map(blog => blog.toJSON()))
+  } catch (error) {
+    next(error)
+  }
 })
 
 router.get('/:id', (request, response, next) => {
