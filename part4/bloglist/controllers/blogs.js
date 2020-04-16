@@ -19,13 +19,14 @@ router.get('/:id', (request, response, next) => {
     .catch((error) => next(error))
 })
 
-router.post('/', (request, response, next) => {
+router.post('/', async (request, response, next) => {
   const blog = new Blog(request.body)
-  blog.save()
-    .then((result) => {
-      response.status(201).json(result.toJSON())
-    })
-    .catch((error) => next(error))
+  try {
+    const savedBlog = await blog.save()
+    response.status(201).json(savedBlog.toJSON())
+  } catch (exception) {
+    next(exception)
+  }
 })
 
 module.exports = router

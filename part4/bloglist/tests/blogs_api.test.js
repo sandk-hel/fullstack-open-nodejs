@@ -50,6 +50,42 @@ describe('Get all', () => {
   })
 })
 
+describe('Create Blog', () => {
+  const blogContent = {
+    title: 'You Don\'t Know JS Yet',
+    author: 'Kyle Simpson',
+    likes: 123,
+    url: 'https://github.com/getify/You-Dont-Know-JS'
+  }
+
+  test("create blog is successful", async () => {
+    await api.post('/api/blogs')
+          .send(blogContent)
+          .expect(201)
+          .expect('Content-Type', /application\/json/)
+  })
+
+  test('creating blog increases blog in db', async () => {
+    const blogsInDbBefore = await helper.blogsInDb()
+
+    await api.post('/api/blogs')
+    .send(blogContent)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const blogsInDbAfter = await helper.blogsInDb()
+    expect(blogsInDbBefore.length + 1).toEqual(blogsInDbAfter.length)
+  })
+
+  test('creating blog returns the created blog', async() => {
+    const blog = await api.post('/api/blogs')
+      .send(blogContent)
+    expect(blog.body).toEqual(
+      expect.objectContaining(blogContent)
+    )
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
