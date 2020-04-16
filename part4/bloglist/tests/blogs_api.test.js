@@ -84,6 +84,21 @@ describe('Create Blog', () => {
       expect.objectContaining(blogContent)
     )
   })
+
+  test('missing like is assigned 0 value', async() => {
+    const blogContentWithoutLike = {
+      title: 'You Don\'t Know JS Yet',
+      author: 'Kyle Simpson',
+      url: 'https://github.com/getify/You-Dont-Know-JS'
+    }
+
+    const blog = await api.post('/api/blogs')
+      .send(blogContentWithoutLike)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    expect(blog.body.likes).toBeDefined()
+    expect(blog.body.likes).toBe(0)
+  })
 })
 
 afterAll(() => {

@@ -20,8 +20,13 @@ router.get('/:id', (request, response, next) => {
 })
 
 router.post('/', async (request, response, next) => {
-  const blog = new Blog(request.body)
+  const title = request.body.title
+  const author = request.body.author
+  const url = request.body.url
+  const likes = request.body.likes || 0
+
   try {
+    const blog = new Blog({ title, author, url, likes })
     const savedBlog = await blog.save()
     response.status(201).json(savedBlog.toJSON())
   } catch (exception) {
