@@ -7,9 +7,17 @@ userRouter.post('/', async (request, response, next) => {
   const name = request.body.name
   const password = request.body.password
 
+  if (password === undefined) {
+    return response.status(400).send({ error: 'Password must not be empty' })
+  }
+  
+  if (password.length < 3) {
+    return response.status(400).send({ error: 'Password must be at least 3 characters' })
+  }
+
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
-
+  
   try {
     const user = new User({ username, name, passwordHash })
     const savedUser = await user.save()
