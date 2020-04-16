@@ -99,6 +99,30 @@ describe('Create Blog', () => {
     expect(blog.body.likes).toBeDefined()
     expect(blog.body.likes).toBe(0)
   })
+
+  test('missing title responds with bad request', async() => {
+    const missingTitleBlog = {
+      author: 'Kyle Simpson',
+      url: 'https://github.com/getify/You-Dont-Know-JS'
+    }
+
+    const response = await api.post('/api/blogs')
+      .send(missingTitleBlog)
+      .expect(400)
+    expect(response.body.error).toBeDefined()
+  })
+
+  test('missing url responds with bad request', async() => {
+    const missingUrlBlog = {
+      title: 'You Don\'t Know JS Yet',
+      author: 'Kyle Simpson',
+    }
+    const response = await api.post('/api/blogs')
+      .send(missingUrlBlog)
+      .expect(400)
+    expect(response.body.error).toBeDefined()
+  })
+
 })
 
 afterAll(() => {
