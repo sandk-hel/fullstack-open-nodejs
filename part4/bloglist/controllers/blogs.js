@@ -21,6 +21,16 @@ router.delete('/:id', async (request, response, next) => {
   }
 })
 
+router.put('/:id', async (request, response, next) => {
+  try {
+    const updatedObject = await Blog.findByIdAndUpdate(request.params.id, request.body, { new: true })
+    response.json(updatedObject)
+  } catch (exception) {
+    console.log('Exception ', exception)
+    next(exception)
+  }
+})
+
 router.get('/:id', (request, response, next) => {
   Blog.findById(request.params.id)
     .then((blog) => blog.toJSON())

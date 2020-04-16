@@ -153,6 +153,31 @@ describe('delete a blog', () => {
   })
 })
 
+describe('Updating blog', () => {
+  const blogContent = {
+    title: 'You Don\'t Know JS Yet',
+    author: 'Kyle Simpson',
+    likes: 123,
+    url: 'https://github.com/getify/You-Dont-Know-JS'
+  }
+
+  let savedBlog = null
+
+  beforeEach(async () => {
+    const blog = new Blog(blogContent)
+   savedBlog = await blog.save().then(b => b.toJSON())
+  })
+
+  test('update title', async () => {
+    await api.put(`/api/blogs/${savedBlog.id}`)
+      .send({ title: 'You will know it' })
+      .expect(200)
+    const updatedBlog = await Blog.findById(savedBlog.id)
+    expect(updatedBlog).not.toBeNull()
+    expect(updatedBlog.title).toBe('You will know it')
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
