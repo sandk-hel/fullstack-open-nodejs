@@ -12,6 +12,15 @@ router.get('/', async (request, response, next) => {
   }
 })
 
+router.delete('/:id', async (request, response, next) => {
+  try {
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } catch (error) {
+    next(error)
+  }
+})
+
 router.get('/:id', (request, response, next) => {
   Blog.findById(request.params.id)
     .then((blog) => blog.toJSON())

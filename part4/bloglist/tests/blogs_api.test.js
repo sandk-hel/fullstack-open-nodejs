@@ -125,6 +125,34 @@ describe('Create Blog', () => {
 
 })
 
+describe('delete a blog', () => {
+
+  const blogContent = {
+    title: 'You Don\'t Know JS Yet',
+    author: 'Kyle Simpson',
+    likes: 123,
+    url: 'https://github.com/getify/You-Dont-Know-JS'
+  }
+
+  let savedBlog = null
+
+  beforeEach(async () => {
+    const blog = new Blog(blogContent)
+   savedBlog = await blog.save().then(b => b.toJSON())
+  })
+
+  test('successful status code', async () => {
+    let blogBeforeDeleting = await Blog.findById(savedBlog.id)
+    expect(blogBeforeDeleting).not.toBeNull()
+    expect(blogBeforeDeleting.id).not.toBeNull()
+
+    await api.delete(`/api/blogs/${savedBlog.id}`)
+            .expect(204)
+    let blogAfterDeleteRequest = await Blog.findById(savedBlog.id)
+    expect(blogAfterDeleteRequest).toBeNull()
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
