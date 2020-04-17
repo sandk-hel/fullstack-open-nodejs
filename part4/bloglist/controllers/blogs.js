@@ -17,7 +17,17 @@ router.get('/', async (request, response, next) => {
 
 router.delete('/:id', async (request, response, next) => {
   try {
-    await Blog.findByIdAndDelete(request.params.id)
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
+    const blog = await Blog.findById(request.params.id)
+
+    if (blog.user.toString() !== user._id.toString()) {
+      return response
+        .status(403)
+        .send({ error: 'Blog deletion not permitted' })
+    }
+
+    await blog.remove()
     response.status(204).end()
   } catch (error) {
     next(error)
