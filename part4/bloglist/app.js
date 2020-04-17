@@ -10,6 +10,7 @@ const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
 
 const app = express()
+app.use(middleware.tokenExtractor)
 app.use(middleware.requestLogger)
 app.use(express.json())
 app.use(cors())

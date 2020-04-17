@@ -1,5 +1,15 @@
 const logger = require('./logger')
 
+const tokenExtractor = (request, response, next) => {
+  let token = null
+  const authorizationHeader = request.get('authorization')
+  if (authorizationHeader && authorizationHeader.toLowerCase().startsWith('bearer ')) {
+    token = authorizationHeader.substring(7)
+  }
+  request.token = token
+  next()
+}
+
 const requestLogger = (request, response, next) => {
   logger.info('Method: ', request.method)
   logger.info('Path: ', request.path)
@@ -19,10 +29,10 @@ const errorHandler = (error, request, response, next) => {
   }
   if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
-  } 
+  }
 
   if (error.name === 'JsonWebTokenError') {
-    return response.status(401).json({ 
+    return response.status(401).json({
       error: 'invalid token'
     })
   }
@@ -30,6 +40,7 @@ const errorHandler = (error, request, response, next) => {
 }
 
 module.exports = {
+  tokenExtractor,
   requestLogger,
   unknownEndpoint,
   errorHandler,
