@@ -36,4 +36,5 @@ userSchema.plugin(uniqueValidator)
 
 const User = mongoose.model('User', userSchema)
 mongoose.set('useCreateIndex', true)
+mongoose.set('useFindAndModify', false)
 module.exports = User

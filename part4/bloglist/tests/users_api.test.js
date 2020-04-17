@@ -7,7 +7,7 @@ const helper = require('./test_helper')
 
 const api = supertest(app)
 
-beforeAll(async () => {
+beforeEach(async () => {
   await User.deleteMany({})
 })
 
