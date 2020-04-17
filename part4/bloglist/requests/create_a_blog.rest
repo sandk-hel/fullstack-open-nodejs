@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
+Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOThkYTk1ZTgwMzJlNGU5MzU5Yzk5ZiIsInVzZXJuYW1lIjoiazZzYW5kZWVwIiwiaWF0IjoxNTg3MDkyMDU5fQ.4lmBID4wamKOf4S89XgAfe8Cvys9bkStsbWh93dVR78
 Content-Type: application/json
 
 {
-    "title": "Promises Chaining",
-    "author": "JavaScript Info",
-    "url": "https://javascript.info/promise-chaining",
-    "likes": 1000
+    "title": "Effective Javascript",
+    "author": "Eric Elliot",
+    "url": "https://javascript.info/effective-js",
+    "likes": 234
 }
