@@ -37,7 +37,8 @@ router.delete('/:id', async (request, response, next) => {
 router.put('/:id', async (request, response, next) => {
   try {
     const updatedObject = await Blog.findByIdAndUpdate(request.params.id, request.body, { new: true })
-    response.json(updatedObject)
+      .populate('user', {username: 1, name: 1})
+    response.json(updatedObject.toJSON())
   } catch (exception) {
     console.log('Exception ', exception)
     next(exception)
