@@ -1,6 +1,7 @@
 const express = require('express')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const Comment = require('../models/comment')
 
 const router = express.Router()
 const jwt = require('jsonwebtoken')
@@ -8,7 +9,9 @@ const jwt = require('jsonwebtoken')
 
 router.get('/', async (request, response, next) => {
   try {
-    const blogs = await Blog.find().populate('user', {username: 1, name: 1})
+    const blogs = await Blog.find()
+                            .populate('user', { username: 1, name: 1 })
+                            .populate('comments', {text: 1})
     response.json(blogs.map(blog => blog.toJSON()))
   } catch (error) {
     next(error)
@@ -37,7 +40,9 @@ router.delete('/:id', async (request, response, next) => {
 router.put('/:id', async (request, response, next) => {
   try {
     const updatedObject = await Blog.findByIdAndUpdate(request.params.id, request.body, { new: true })
-      .populate('user', {username: 1, name: 1})
+      .populate('user', { username: 1, name: 1 })
+      .populate('comments', {text: 1})
+
     response.json(updatedObject.toJSON())
   } catch (exception) {
     console.log('Exception ', exception)
@@ -73,6 +78,23 @@ router.post('/', async (request, response, next) => {
     await user.save()
 
     response.status(201).json(savedBlog.toJSON())
+  } catch (exception) {
+    next(exception)
+  }
+})
+
+router.post('/:id/comments', async (request, response, next) => {
+  try {
+    const id = request.params.id
+    const blog = await Blog.findById(id)
+    const text = request.body.text
+
+    const comment = new Comment({ text })
+    comment.blog = blog._id
+    const savedComment = await comment.save()
+    blog.comments.push(savedComment._id)
+    await blog.save()
+    response.send(comment.toJSON())
   } catch (exception) {
     next(exception)
   }
