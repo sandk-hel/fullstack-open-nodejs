@@ -176,7 +176,9 @@ const resolvers = {
         return null
       }
 
-      const updatedAuthor = { ...author, born }
+      const authorBooks = books.filter(b => b.author === author.name)
+
+      const updatedAuthor = { ...author, born, bookCount: authorBooks.length }
 
       authors = authors.map(author => author.name === name 
         ? updatedAuthor 
