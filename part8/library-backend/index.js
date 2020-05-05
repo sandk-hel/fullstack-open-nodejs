@@ -1,6 +1,10 @@
 const { ApolloServer, gql } = require('apollo-server')
+const mongoose = require('mongoose')
 const uuid = require('uuid')
+const Book = require('./models/book')
+const Author = require('./models/author')
 
+const MONGO_DB_URL = "mongodb+srv://fullstack:fullstack@cluster0-jrrmj.mongodb.net/library-graphql?retryWrites=true&w=majority"
 let authors = [
   {
     name: 'Robert Martin',
@@ -84,6 +88,16 @@ let books = [
   },
 ]
 
+console.log('Connecting to MongoDB')
+mongoose.connect(MONGO_DB_URL, { useNewUrlParser: true, 
+  useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB')
+  })
+  .catch(error => {
+    console.log('Error connecting to MongoDB: ', error.message)
+  })
+
 const typeDefs = gql`
   type Author {
     id: ID!
@@ -95,7 +109,7 @@ const typeDefs = gql`
   type Book {
     id: ID!
     title: String!
-    author: String!
+    author: Author!
     published: Int! 
     genres: [String!]!
   }
@@ -146,24 +160,25 @@ const resolvers = {
   },
 
   Mutation: {
-    addBook: (root, args) => {
+    addBook: async (root, args) => {
       const authorName = args.author 
-      const author = authors.find(a => a.name === authorName) 
+      let author = await Author.findOne({ name: authorName })
       
       if (!author) {
-        const newAuthor = { id: uuid(), name: authorName }
-        authors = [ ...authors, newAuthor]
+        author = new Author({ name: authorName })
+        await author.save()
       }
 
       const newBook = {
         title: args.title,
-        author: authorName,
         genres: args.genres,
-        published: args.published,
-        id: uuid()
+        published: args.published
       }
-      books = [...books, newBook]
-      return newBook
+
+      const book = new Book(newBook)
+      book.author = author
+      await book.save()
+      return book.populate('author')
     },
 
     editAuthor: (root, args) => {
