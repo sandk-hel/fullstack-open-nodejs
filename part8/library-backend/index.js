@@ -97,7 +97,11 @@ const resolvers = {
   },
 
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError('Log in to create new book')
+      }
+
       const authorName = args.author
       let author = await Author.findOne({ name: authorName })
 
@@ -122,7 +126,11 @@ const resolvers = {
       }
     },
 
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError('Login to edit author detail')
+      }
+      
       const name = args.name
       const born = args.setBornTo
 
