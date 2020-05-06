@@ -92,7 +92,8 @@ const resolvers = {
     },
     allAuthors: () => {
       return Author.find({})
-    }
+    },
+    me: (root, args, { currentUser}) => currentUser
   },
 
   Mutation: {
@@ -182,6 +183,14 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: async ({ req }) => {
+    const authorization = req ? req.headers.authorization : null
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+      const decodedToken = jwt.verify(authorization.substr(7),SECRET_KEY)
+      const currentUser = await User.findById(decodedToken.id)
+      return { currentUser }
+    }
+  }
 })
 
 server.listen().then(({ url }) => {
