@@ -1,10 +1,14 @@
-const { ApolloServer, gql, UserInputError } = require('apollo-server')
+const { ApolloServer, gql, UserInputError, AuthenticationError } = require('apollo-server')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const Book = require('./models/book')
 const Author = require('./models/author')
+const User = require('./models/user')
 
 const MONGO_DB_URL = "mongodb+srv://fullstack:fullstack@cluster0-jrrmj.mongodb.net/library-graphql?retryWrites=true&w=majority"
 mongoose.set('useCreateIndex', true)
+const SECRET_KEY = "7358gjzXbbbnNf7B"
 
 console.log('Connecting to MongoDB')
 mongoose.connect(MONGO_DB_URL, {
@@ -34,11 +38,23 @@ const typeDefs = gql`
     genres: [String!]!
   }
 
+  type User {
+    username: String!
+    favoriteGenre: String!
+    id: ID!
+  }
+
+  type Token {
+    value: String!
+  }
+
   type Query {
     bookCount: Int!
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
+
+    me: User
   }
 
   type Mutation {
@@ -49,6 +65,17 @@ const typeDefs = gql`
 
     editAuthor(name: String!, 
       setBornTo: Int!): Author
+
+    createUser(
+      username: String!,
+      favoriteGenre: String!,
+      password: String!
+    ): User
+    
+    login(
+      username: String!,
+      password: String!
+    ): Token
   }
 `
 
@@ -107,6 +134,47 @@ const resolvers = {
       author.born = born
       await author.save()
       return author
+    },
+
+    createUser: async (root, args) => {
+      const username = args.username
+      const password = args.password
+      const favoriteGenre = args.favoriteGenre
+      
+      const passwordHash = await bcrypt.hash(password, 10)
+      const user = User({ username, favoriteGenre, passwordHash })
+      try {
+        await user.save()
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args
+        })
+      }
+      return user
+    },
+
+    login: async (root, args) => {
+      const username = args.username
+      const password = args.password
+
+      const user = await User.findOne({ username })
+      if (!user) {
+        throw new AuthenticationError("Invalid username or password")
+      }
+      
+      const match = await bcrypt.compare(password, user.passwordHash)
+
+      if (!match) {
+        throw new AuthenticationError("Invalid username or password")
+      }
+      
+      const userForSigning = {
+        username,
+        id: user._id
+      }
+      
+      const value = jwt.sign(userForSigning, SECRET_KEY)
+      return { value }
     }
   }
 }
