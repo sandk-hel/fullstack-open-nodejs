@@ -44,6 +44,11 @@ const typeDefs = gql`
     id: ID!
   }
 
+  type Recommendation {
+    books: [Book!]!
+    genre: String!
+  }
+
   type Token {
     value: String!
   }
@@ -51,10 +56,12 @@ const typeDefs = gql`
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks(author: String, genre: String): [Book!]!
+    allBooks(genre: String): [Book!]!
     allAuthors: [Author!]!
 
     me: User
+
+    recommendation: Recommendation
   }
 
   type Mutation {
@@ -88,11 +95,30 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      return await Book.find({}).populate('author')
+      const genre = args.genre
+      let filter = {}
+
+      if (genre) {
+        filter = { genres: { $elemMatch: { $eq: genre } } }
+      }
+
+      return await Book.find(filter).populate('author')
     },
     allAuthors: () => {
       return Author.find({})
     },
+
+    recommendation: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError('Must be logged in for recommendations', {
+          invalidArgs: args
+        })
+      }
+      const genre = currentUser.favoriteGenre
+      const books = await Book.find({ genres: { $elemMatch: { $eq: genre }}}).populate('author')
+      return { books, genre }
+    },
+
     me: (root, args, { currentUser}) => currentUser
   },
 
