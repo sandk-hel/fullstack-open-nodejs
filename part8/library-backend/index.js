@@ -1,10 +1,13 @@
-const { ApolloServer, gql, UserInputError, AuthenticationError } = require('apollo-server')
+const { ApolloServer, gql, UserInputError, AuthenticationError, PubSub } = require('apollo-server')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Book = require('./models/book')
 const Author = require('./models/author')
 const User = require('./models/user')
+const pubsub = new PubSub()
+
+const BOOK_ADDED = 'BOOK_ADDED'
 
 const MONGO_DB_URL = "mongodb+srv://fullstack:fullstack@cluster0-jrrmj.mongodb.net/library-graphql?retryWrites=true&w=majority"
 mongoose.set('useCreateIndex', true)
@@ -84,6 +87,10 @@ const typeDefs = gql`
       password: String!
     ): Token
   }
+
+  type Subscription {
+    bookAdded: Book!
+  }
 `
 
 const resolvers = {
@@ -144,7 +151,9 @@ const resolvers = {
         book.author = author
 
         await book.save()
-        return book.populate('author')
+        book.populate('author')
+        pubsub.publish(BOOK_ADDED, { bookAdded: book })
+        return book
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args
@@ -211,6 +220,11 @@ const resolvers = {
       const value = jwt.sign(userForSigning, SECRET_KEY)
       return { value }
     }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator([BOOK_ADDED])
+    }
   }
 }
 
@@ -227,7 +241,8 @@ const server = new ApolloServer({
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })
 
