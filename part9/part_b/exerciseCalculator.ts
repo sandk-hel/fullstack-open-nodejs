@@ -1,32 +1,4 @@
-interface ExerciseInputs {
-  target: number;
-  exerciseHours: Array<number>;
-}
-
-const parseExerciseInputs = (argv: Array<string>): ExerciseInputs => {
-  if (argv.length < 4) {
-    throw Error('Pass exercise hours separated by spaces');
-  }
-  
-  const [,, targetString, ...exerciseHourStrings ] = argv;
-
-  const target = Number(targetString);
-
-  if (isNaN(target)) {
-    throw new Error('target must be a valid number');
-  }
-  
-  const exerciseHours = exerciseHourStrings.map(a => Number(a));
-  if (exerciseHours.find(a => isNaN(a)) !== undefined) {
-    throw Error('Invalid input, exercise hours must be numbers separated by space');
-  }
-  return {
-    target,
-    exerciseHours
-  };
-};
-
-interface Result {
+export interface Result {
   periodLength: number;
   trainingDays: number; 
   success: boolean;
@@ -48,7 +20,7 @@ const ratingText = (rating: number): string => {
   return 'excellent, keep up the good work!';
 };
 
-const calculateExercises = (dailyExercises: Array<number>, target: number): Result => {
+export const calculateExercises = (dailyExercises: Array<number>, target: number): Result => {
   const periodLength = dailyExercises.length;
   const trainingDays = dailyExercises.filter(a => a > 0).length;
   const average = dailyExercises.reduce((sum, daily) => sum + daily , 0) / dailyExercises.length;
@@ -70,11 +42,3 @@ const calculateExercises = (dailyExercises: Array<number>, target: number): Resu
     average 
   };
 };
-
-try {
-  const { target, exerciseHours } = parseExerciseInputs(process.argv);
-  const result = calculateExercises(exerciseHours, target);
-  console.log(result);
-} catch (exception) {
-  console.log('Error occurred: ', exception.message);
-}

@@ -1,0 +1,7 @@
+POST http://localhost:3000/exercises
+Content-Type: application/json
+Accept: application/json
+
+{
+  "target": 2.5
+}
