@@ -1,49 +1,54 @@
-
 /**
  * 
  * @param query express request
  */
-export const parseBmiQueries = (query: any): { weight: number, height: number } => {
-  const weight = Number(query.weight)
-  const height = Number(query.height)
+
+ export interface BmiQuery<T> {
+   weight: T;
+   height: T;
+ }
+
+export const parseBmiQueries = (query: BmiQuery<string>): BmiQuery<number> => {
+  const weight = Number(query.weight);
+  const height = Number(query.height);
   
   if (isNaN(weight) || isNaN(height)) {
-    throw new Error('malformatted parameters')
+    throw new Error('malformatted parameters');
   }
 
   return {
     weight,
     height
-  }
-}
+  };
+};
 
 /**
  * 
  * @param height height in cm
  * @param weight weight in kg
  */
-export const calculateBmi = (height: number, weight: number): String => {
+export const calculateBmi = (height: number, weight: number): string => {
   if (height === 0) {
-    throw new Error('Zero division error, height must be greater than 0')
+    throw new Error('Zero division error, height must be greater than 0');
   }
-  const heightInMeter = height / 100
-  const bmi = weight / (heightInMeter * heightInMeter)
+  const heightInMeter = height / 100;
+  const bmi = weight / (heightInMeter * heightInMeter);
   
   if (bmi < 18.5) {
-    return 'Underweight'
+    return 'Underweight';
   }
 
   if (18.5 <= bmi && bmi <= 24.9) {
-    return 'Normal (healthy weight)'
+    return 'Normal (healthy weight)';
   }
 
   if (25 <= bmi && bmi <= 29.9) {
-    return 'Overweight'
+    return 'Overweight';
   }
   
   if (30 <= bmi && bmi <= 39.9) {
-    return 'Obese'
+    return 'Obese';
   }
 
-  throw Error(`Invalid bmi ${bmi}, could not determine the range`)
-}
+  throw Error(`Invalid bmi ${bmi}, could not determine the range`);
+};
