@@ -1,32 +1,19 @@
 
-interface Inputs {
-  weight: number 
-  height: number
-}
-
-const parseInputs = (args: Array<String>): Inputs => {
-  if (args.length < 4) {
-    throw new Error('Insufficient parameters, pass weight and height')
-  }
-
-  if (args.length > 4) {
-    throw new Error('Too many parameters') 
-  }
-
-  const height = Number(args[2])
-  const weight = Number(args[3])
-
-  if (isNaN(weight)) {
-    throw new Error('Weight must be a valid number')
-  }
-
-  if (isNaN(height)) {
-    throw new Error('Height must be a valid number')
+/**
+ * 
+ * @param query express request
+ */
+export const parseBmiQueries = (query: any): { weight: number, height: number } => {
+  const weight = Number(query.weight)
+  const height = Number(query.height)
+  
+  if (isNaN(weight) || isNaN(height)) {
+    throw new Error('malformatted parameters')
   }
 
   return {
-    height,
-    weight
+    weight,
+    height
   }
 }
 
@@ -35,7 +22,7 @@ const parseInputs = (args: Array<String>): Inputs => {
  * @param height height in cm
  * @param weight weight in kg
  */
-const calculateBmi = (height: number, weight: number): String => {
+export const calculateBmi = (height: number, weight: number): String => {
   if (height === 0) {
     throw new Error('Zero division error, height must be greater than 0')
   }
@@ -59,11 +46,4 @@ const calculateBmi = (height: number, weight: number): String => {
   }
 
   throw Error(`Invalid bmi ${bmi}, could not determine the range`)
-}
-
-try {
-  const { height, weight } = parseInputs(process.argv)
-  console.log(calculateBmi(height, weight))
-} catch (exception) {
-  console.error('Error occurred:', exception.message)
 }
