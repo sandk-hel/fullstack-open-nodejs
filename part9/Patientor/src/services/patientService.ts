@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { NonSensitivePatientEntry, Patient } from '../types';
+import { NonSensitivePatientEntry, Patient, NewPatient } from '../types';
 import patients from '../../data/patients';
 
 const getAll = (): Patient[] => {
@@ -17,11 +17,16 @@ const getNonSensitivePatientEntries = (): NonSensitivePatientEntry[] => {
   );
 };
 
-const addPatient = (name: string, dateOfBirth: string, ssn: string, gender: string, occupation: string): NonSensitivePatientEntry => {
-  const id = uuidv4();
-  const patient: Patient = { id, name, dateOfBirth, ssn, gender, occupation };
+const addPatient = (newPatient: NewPatient): NonSensitivePatientEntry => {
+  const patient = {
+    ...newPatient,
+    id: uuidv4()
+  };
   patients.push(patient);
-  return { id, name, dateOfBirth, ssn, gender, occupation };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { ssn,
+     ...nonSensitivePatientEntry } = patient;
+  return nonSensitivePatientEntry;
 };
 
 export default { 
