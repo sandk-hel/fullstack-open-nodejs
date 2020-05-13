@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/patients 
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Sandeep Koirala",
+  "dateOfBirth": "1987-01-13",
+  "ssn": "130187-2911",
+  "gender": "male",
+  "occupation": "Software Developer"
+}

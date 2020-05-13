@@ -8,4 +8,10 @@ patientsRouter.get('/', (_req, res) => {
   res.send(patients);
 });
 
+patientsRouter.post('/', (req, res) => {
+  const { name, dateOfBirth, ssn, gender, occupation }  = req.body;
+  const newPatient = patientService.addPatient(name, dateOfBirth, ssn, gender, occupation);
+  res.send(newPatient);
+});
+
 export default patientsRouter;
