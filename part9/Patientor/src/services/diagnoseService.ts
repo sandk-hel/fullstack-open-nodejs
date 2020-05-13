@@ -1,4 +1,4 @@
-import { Diagnose } from '../../types';
+import { Diagnose } from '../types';
 import diagnoses from '../../data/diagnose';
 
 const getAll = (): Diagnose[] => {
