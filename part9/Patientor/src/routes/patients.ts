@@ -15,4 +15,12 @@ patientsRouter.post('/', (req, res) => {
   res.json(addedPatient);
 });
 
+patientsRouter.get('/:id', (req, res) => {
+  const patient = patientService.getPatient(req.params.id);
+  if (!patient) {
+    return res.status(400).json({ error: 'Patient could not be found'} );
+  }
+  res.json(patient);
+});
+
 export default patientsRouter;
