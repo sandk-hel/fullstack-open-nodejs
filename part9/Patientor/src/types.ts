@@ -34,10 +34,10 @@ interface HospitalEntry extends BaseEntry {
 interface OccupationalHealthCareEntry extends BaseEntry {
   type: "OccupationalHealthcare";
   employerName: string;
-  sickLeave?: { startDate: string; endDate: string }
+  sickLeave?: { startDate: string; endDate: string };
 }
 
-export type Entry = HealthCheckEntry | HospitalEntry | OccupationalHealthCareEntry
+export type Entry = HealthCheckEntry | HospitalEntry | OccupationalHealthCareEntry;
 
 export enum Gender {
   Male = "male",
