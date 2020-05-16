@@ -1,0 +1,16 @@
+POST http://localhost:3001/api/patients/d27736ec-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "type": "OccupationalHealthcare",
+  "description": "Virus Infection",
+  "specialist": "AK Chaturvedi",
+  "date": "2020-05-02",
+  "employerName": "Introdex Oy",
+  "sickLeave": {
+    "startDate": "2020-05-02",
+    "endDate": "2020-05-19"
+  },
+  "diagnosisCodes": ["c12"]
+}
+
